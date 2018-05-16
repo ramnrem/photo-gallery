@@ -1,0 +1,172 @@
+html,
+body {
+	position: fixed;
+	z-index: 0;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+	margin: 0;
+	padding: 0;
+}
+
+
+
+.modal {
+	display: none; 
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+}
+
+
+
+.modal-content {
+	position: relative;
+	margin: 2% 15% 0 15%;
+	width: 70%;
+	height: 70%;
+}
+
+.arrow {
+	cursor: pointer;
+	z-index: 2;
+	width: 20px;
+	height: 75px;
+	position: absolute;
+	top: 50%;
+	margin-top: -50px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	transition: 0.5s;
+	opacity: 0.6;
+}
+
+.arrow:hover {
+	opacity: 1;
+	width: 25px;
+	height: 80px;
+}
+
+#arrow-left {
+	background-image: url('images/left.png'); 
+	left:0;
+	margin-left: 10px;
+
+}
+
+#arrow-right {
+	background-image: url('images/right.png'); 
+	right: 0;
+	margin-right: 10px;
+}
+
+#close-btn {
+	background-image: url('images/close.png'); 
+	right: 0;
+	cursor: pointer;
+	z-index: 2;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	top: 100%;
+	margin-top: 10px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+
+#slider {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.slides {
+	display: block;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	margin-left: 100%;
+	width: 10000px;
+
+}
+
+.slide {
+	float: left;
+	list-style-type: none;
+	height: 100%;
+	margin-right: 10px;
+}
+
+.slide img {
+	height: 100%;
+	width: auto;
+}
+
+/* Галерея */
+
+.gallery {
+	width: 70%;
+	height: 70%;
+	margin: 2% 15% 0 15%;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	grid-template-rows: repeat(auto-fill, minmax(200px, 1fr));
+	justify-items: center;
+
+}
+
+.showModal {
+	margin-top: 25px;
+	width: 200px;
+	height: 200px;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat; 
+	cursor: pointer;
+}
+
+.image1 {
+	background-image: url('images/1 (1).jpg');
+}
+.image2 {
+	background-image: url('images/1 (2).jpg');
+}
+.image3 {
+	background-image: url('images/1 (3).jpeg');
+}
+.image4 {
+	background-image: url('images/1 (4).jpeg');
+}
+.image5 {
+	background-image: url('images/1 (5).jpeg');
+}
+.image6 {
+	background-image: url('images/1 (6).jpeg');
+}
+.image7 {
+	background-image: url('images/1 (7).jpeg');
+}
+.image8 {
+	background-image: url('images/1 (8).jpeg');
+}
+.image9 {
+	background-image: url('images/1 (9).jpeg');
+}
+.image10 {
+	background-image: url('images/1 (10).jpeg');
+}
+.image11 {
+	background-image: url('images/1 (11).jpeg');
+}
+.image12 {
+	background-image: url('images/1 (12).jpeg');
+}
