@@ -6,11 +6,11 @@ $('document').ready(function() {
 		let el1 = $(child1).get(0);
 		let el2 = $(child2).get(0);
 		let el3 = $(child3).get(0);
-		if(p.offsetWidth < el1.offsetWidth + el2.offsetWidth) {
+		if( p.offsetWidth < el1.offsetWidth + el2.offsetWidth) {
 			return 1;
 		} else if(p.offsetWidth < el1.offsetWidth + el2.offsetWidth + el3.offsetWidth) {
 			return 2;	
-		}
+		} else return 0;
 	};
 
 	//Функция применяющия фильтры на слайд 
@@ -82,11 +82,15 @@ $('document').ready(function() {
 		//Выключить фильтр слайдам в видимой области
 		disableFilters(slide[currentImage]);
 
-		//Включить фильтр слайдам вне видимой области 
-		enableFilters(slide[currentImage + $('#slider').isOverflowing(
-			slide[currentImage],
-			slide[currentImage+1],
-			slide[currentImage+2])]);
+		//Включить фильтр слайдам вне видимой области
+		if(currentImage+1 != slide.length) {
+			enableFilters(slide[currentImage + $('#slider').isOverflowing(
+				slide[currentImage],
+				slide[currentImage+1],
+				slide[currentImage+2])]);
+		}
+
+
 
 		//Анимируется подъезжание слайдов
 		$('.slides').animate({
@@ -150,10 +154,12 @@ $('document').ready(function() {
 
 		disableFilters(slide[currentImage]);
 
-		enableFilters(slide[currentImage + $('#slider').isOverflowing(
-			slide[currentImage],
-			slide[currentImage+1],
-			slide[currentImage+2])]);
+		if(currentImage+1 != slide.length) {
+			enableFilters(slide[currentImage + $('#slider').isOverflowing(
+				slide[currentImage],
+				slide[currentImage+1],
+				slide[currentImage+2])]);
+		}
 
 	});
 
@@ -179,10 +185,12 @@ $('document').ready(function() {
 
 		disableFilters(slide[currentImage]);
 
-		enableFilters(slide[currentImage + $('#slider').isOverflowing(
-			slide[currentImage],
-			slide[currentImage+1],
-			slide[currentImage+2])]);
+		if(currentImage+1 != slide.length) {
+			enableFilters(slide[currentImage + $('#slider').isOverflowing(
+				slide[currentImage],
+				slide[currentImage+1],
+				slide[currentImage+2])]);
+		}
 
 	});
 
@@ -205,10 +213,12 @@ $('document').ready(function() {
 			}
 			disableFilters(slide[currentImage]);
 
-			enableFilters(slide[currentImage + $('#slider').isOverflowing(
-				slide[currentImage],
-				slide[currentImage+1],
-				slide[currentImage+2])]);
+			if(currentImage+1 != slide.length) {
+				enableFilters(slide[currentImage + $('#slider').isOverflowing(
+					slide[currentImage],
+					slide[currentImage+1],
+					slide[currentImage+2])]);
+			}
 			
 		}
 		else{
@@ -230,10 +240,12 @@ $('document').ready(function() {
 			}
 			disableFilters(slide[currentImage]);
 
-			enableFilters(slide[currentImage + $('#slider').isOverflowing(
-				slide[currentImage],
-				slide[currentImage+1],
-				slide[currentImage+2])]);
+			if(currentImage+1 != slide.length) {
+				enableFilters(slide[currentImage + $('#slider').isOverflowing(
+					slide[currentImage],
+					slide[currentImage+1],
+					slide[currentImage+2])]);
+			}
 		}
 	});
 
