@@ -35,10 +35,16 @@ $('document').ready(function() {
 	let modal = document.getElementById('galleryModal');
 
 	let slide,
+		m_slide,
 		slidesWidth,
 		currentImage,
 		currentMargin,
-		clickedImage;
+		clickedImage,
+		m_clickedImage,
+		m_currentMargin,
+		m_slidesWidth,
+		m_currentImage;
+
 
 	// Открытие медиа режима
 	$('.showModal').click(function(){
@@ -56,27 +62,38 @@ $('document').ready(function() {
 
 		//Текущая картинка
 		currentImage = clickedImage;
+		m_currentImage = clickedImage;
 
 		//Текущий отступ
 		currentMargin = 0;
+		m_currentMargin = 0;
 
 		//Ширина линии слайдов
 		slidesWidth = 0;
+		m_slidesWidth = 0;
 
 		//Массив слайдов
 		slide = document.getElementsByClassName('slide');
+		m_slide = document.getElementsByClassName('mini-slide');
+
 
 		//Пподсчет ширины всех слайдов
 		for(let i = 0; i < slide.length; i++) {
 			slidesWidth = slidesWidth + slide[i].offsetWidth + 10;
+			m_slidesWidth = m_slidesWidth + m_slide[i].offsetWidth + 10
 		}
 
+		//Запас на анимацию при наведении
+		m_slidesWidth = m_slidesWidth + 300;
+
 		$('.slides').css('width', slidesWidth);
+		$('.mini-slides').css('width', m_slidesWidth);
 
 		//Вычисление отступа для помещения кликнутой картинки в текущий слайд
 		if(clickedImage > 0) {
 			for(let i = 0; i < clickedImage; i++){
 				currentMargin = currentMargin - slide[i].offsetWidth - 10;
+				m_currentMargin = m_currentMargin - m_slide[i].offsetWidth - 10
 			}
 		}
 
@@ -94,7 +111,13 @@ $('document').ready(function() {
 		//Анимируется подъезжание слайдов
 		$('.slides').animate({
 			marginLeft: currentMargin
-		})
+		}, 670)
+
+		$('.mini-slides').animate({
+			marginLeft: m_currentMargin
+		}, 1000)
+
+		$('#slider').addClass('slider-active');
 
 		//Стилизация мини-слайдера при наведении 
 		let op065 = null, 
@@ -128,7 +151,7 @@ $('document').ready(function() {
 
 			});
 		},function(){
-			$(this).css('opacity', '0');
+			$(this).css('opacity', '1'); // 0
 			if (op065 !== null && op0 !== null) {
 				clearTimeout(op065);
 				clearTimeout(op0);
@@ -145,11 +168,14 @@ $('document').ready(function() {
 				opacity: '1'
 			}, 1000)
 
+			$('#slider').removeClass('slider-active');
+
 			//Исчезает окно медиа режима
 			$('#galleryModal').css('display', 'none');
 
 			//Обновляется внешний отступ для анимации при повторной открытии медио режима
 			$('.slides').css('margin-left','100%');
+			$('.mini-slides').css('margin-left','100%');
 
 		}
 	});
@@ -159,6 +185,8 @@ $('document').ready(function() {
 			opacity: '1'
 		}, 1500)
 
+		$('#slider').removeClass('slider-active');
+
 		//Исчезает окно медиа режима
 		$('#galleryModal').css('display', 'none');
 
@@ -167,6 +195,11 @@ $('document').ready(function() {
 		$('.slides').animate({
 			marginLeft: '100%'
 		});
+		$('.mini-slides').animate({
+			marginLeft: '100%'
+		});
+
+
 	});
 
 	//Клик вправо
@@ -177,18 +210,27 @@ $('document').ready(function() {
 
 		if(currentMargin > x) {
 			currentMargin = currentMargin - slide[currentImage].offsetWidth - 10;
+			m_currentMargin = m_currentMargin - m_slide[m_currentImage].offsetWidth - 10;
 			$('.slides').animate({
 				marginLeft: currentMargin
 			});
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			});
 			currentImage++;
+			m_currentImage++;
 		// Клик вправо при последнем элементе
 		}else{
 			$('.slides').animate({
 				marginLeft: '0'
 			});
+			$('.mini-slides').animate({
+				marginLeft: '0'
+			});
 			currentMargin = 0;
 			currentImage = 0;
-			console.log("last image")
+			m_currentMargin = 0;
+			m_currentImage = 0;
 		}
 
 		disableFilters(slide[currentImage]);
@@ -206,20 +248,31 @@ $('document').ready(function() {
 	$('#arrow-left').click(function(){
 
 		let x = -(slidesWidth - slide[slide.length - 1].offsetWidth + 10);
+		let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
 		if(currentMargin == -20 || currentMargin == 0) {
 			currentMargin = x;
+			m_currentMargin = y;
 			$('.slides').animate({
 				marginLeft: currentMargin
 			})
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			})
 			currentImage = slide.length - 1;
+			m_currentImage = slide.length - 1;
 
 		}else {
 			currentMargin = currentMargin + slide[currentImage - 1].offsetWidth + 10;
+			m_currentMargin = m_currentMargin + m_slide[m_currentImage - 1].offsetWidth + 10;
 			$('.slides').animate({
 				marginLeft: currentMargin
 			})
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			})
 			currentImage--;
+			m_currentImage--;
 		}
 
 		disableFilters(slide[currentImage]);
@@ -233,23 +286,34 @@ $('document').ready(function() {
 
 	});
 
-	$(modal).bind('mousewheel', function(e){
+	$('#slider').bind('mousewheel', function(e){
 		if(e.originalEvent.wheelDelta /120 > 0) {
-			let x = -(slidesWidth - slide[slide.length - 1].clientWidth - 10);
-
+			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
+		
 			if(currentMargin > x) {
-				currentMargin = currentMargin - slide[currentImage].clientWidth - 10;
+				currentMargin = currentMargin - slide[currentImage].offsetWidth - 10;
+				m_currentMargin = m_currentMargin - m_slide[m_currentImage].offsetWidth - 10;
 				$('.slides').animate({
 					marginLeft: currentMargin
-				})
+				});
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
+				});
 				currentImage++;
+				m_currentImage++;
 			}else{
 				$('.slides').animate({
 					marginLeft: '0'
-				})
+				});
+				$('.mini-slides').animate({
+					marginLeft: '0'
+				});
 				currentMargin = 0;
 				currentImage = 0;
+				m_currentMargin = 0;
+				m_currentImage = 0;
 			}
+
 			disableFilters(slide[currentImage]);
 
 			if(currentImage+1 != slide.length) {
@@ -261,22 +325,34 @@ $('document').ready(function() {
 			
 		}
 		else{
-			let x = -(slidesWidth - slide[slide.length - 1].clientWidth + 10);
+			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth + 10);
+			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
 			if(currentMargin == -20 || currentMargin == 0) {
 				currentMargin = x;
+				m_currentMargin = y;
 				$('.slides').animate({
 					marginLeft: currentMargin
+				})
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
 				})
 				currentImage = slide.length - 1;
+				m_currentImage = slide.length - 1;
 
 			}else {
-				currentMargin = currentMargin + slide[currentImage - 1].clientWidth + 10;
+				currentMargin = currentMargin + slide[currentImage - 1].offsetWidth + 10;
+				m_currentMargin = m_currentMargin + m_slide[m_currentImage - 1].offsetWidth + 10;
 				$('.slides').animate({
 					marginLeft: currentMargin
 				})
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
+				})
 				currentImage--;
+				m_currentImage--;
 			}
+
 			disableFilters(slide[currentImage]);
 
 			if(currentImage+1 != slide.length) {
@@ -287,5 +363,117 @@ $('document').ready(function() {
 			}
 		}
 	});
+
+	//мини клик вправо 
+	$('#mini-arrow-right').click(function(){
+		
+		let x = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth - 10 - 320);
+
+		if(m_currentMargin > x) {
+			m_currentMargin = m_currentMargin - m_slide[m_currentImage].offsetWidth - 10;
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			});
+			m_currentImage++;
+		// Клик вправо при последнем элементе
+		}else{
+			$('.mini-slides').animate({
+				marginLeft: '0'
+			});
+			m_currentMargin = 0;
+			m_currentImage = 0;
+		}
+	});
+
+	$('#mini-arrow-left').click(function(){
+
+		let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
+
+		if(m_currentMargin == -20 || m_currentMargin == 0) {
+			m_currentMargin = y;
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			})
+			m_currentImage = slide.length - 1;
+		}else {
+			m_currentMargin = m_currentMargin + m_slide[m_currentImage - 1].offsetWidth + 10;
+			$('.mini-slides').animate({
+				marginLeft: m_currentMargin
+			})
+			m_currentImage--;
+		}
+	});
+
+	$('.mini-slides').bind('mousewheel', function(e){
+		if(e.originalEvent.wheelDelta /120 > 0) {
+			let x = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth - 10 - 320);
+
+			if(m_currentMargin > x) {
+				m_currentMargin = m_currentMargin - m_slide[m_currentImage].offsetWidth - 10;
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
+				});
+				m_currentImage++;
+			// Клик вправо при последнем элементе
+			}else{
+				$('.mini-slides').animate({
+					marginLeft: '0'
+				});
+				m_currentMargin = 0;
+				m_currentImage = 0;
+			}
+		}
+		else{
+			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
+
+			if(m_currentMargin == -20 || m_currentMargin == 0) {
+				m_currentMargin = y;
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
+				})
+				m_currentImage = slide.length - 1;
+			}else {
+				m_currentMargin = m_currentMargin + m_slide[m_currentImage - 1].offsetWidth + 10;
+				$('.mini-slides').animate({
+					marginLeft: m_currentMargin
+				})
+				m_currentImage--;
+			}
+		}
+	});
+
+	//Клик на мини слайд
+	$('.mini-slide').click(function(){
+		m_clickedImage = parseInt(this.className.replace(/[^0-9]/gim,'')) - 1; 
+
+		m_currentImage = m_clickedImage;
+		m_currentMargin = 0;
+		currentImage = m_clickedImage;
+		currentMargin = 0;
+
+		if(m_currentImage > 0) {
+			for(let i = 0; i < m_currentImage; i++){
+				m_currentMargin = m_currentMargin - m_slide[i].offsetWidth - 10;
+				currentMargin = currentMargin - slide[i].offsetWidth - 10;
+			}
+		}
+
+		disableFilters(slide[currentImage]);
+
+		if(currentImage+1 != slide.length) {
+			enableFilters(slide[currentImage + $('#slider').isOverflowing(
+				slide[currentImage],
+				slide[currentImage+1],
+				slide[currentImage+2])]);
+		}
+
+		$('.slides').animate({
+			marginLeft: currentMargin
+		}, 1000)
+
+		$('.mini-slides').animate({
+			marginLeft: m_currentMargin
+		}, 1000)
+	})
 
 });

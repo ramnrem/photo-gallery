@@ -1,5 +1,6 @@
 html,
 body {
+	font-family: 'Roboto', sans-serif;
 	position: fixed;
 	z-index: 0;
 	left: 0;
@@ -82,6 +83,22 @@ body {
 	background-size: contain;
 }
 
+#slider:after {
+	content: 'медиа режим активирован';
+	position: absolute;
+	bottom: -35px;
+	margin-left: 100%;
+	text-transform: uppercase;
+	transition: 1s;
+	opacity: 0;
+}
+
+#slider.slider-active:after{
+	margin-left: 40%;
+	opacity: 1;
+}
+
+
 
 #slider {
 	width: 100%;
@@ -139,7 +156,7 @@ body {
 	height: 45px;
 	position: absolute;
 	top: 50%;
-	margin-top: -12px;
+	margin-top: 15px;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
@@ -168,11 +185,11 @@ body {
 
 #mini-slider {
 	width: 100%;
-	height: 20%;
+	height: 25%;
 	z-index: 1;
 	position: absolute;
-	top: 80%;
-	opacity: 0;
+	top: 75%;
+	opacity: 1; /* 0 */
 	overflow: hidden;
 	transition: 0.5s;
 }
@@ -184,18 +201,20 @@ body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
-	margin-left: 0;
-	width: 10000px;
-	
+	margin-left: 100%;
 }
 
 .mini-slide {
 	float: left;
 	list-style-type: none;
-	height: 80%;
+	height: 50%;
 	margin-right: 10px;
-	margin-top: 0.27%;
+	margin-top: 6.9%;
 	transition: 0.5s;
+}
+
+.mini-slide:last-child{
+	margin-right: 0;
 }
 
 .mini-slide img {
