@@ -26,7 +26,6 @@ body {
 }
 
 
-
 .modal-content {
 	position: relative;
 	margin: 2% 15% 0 15%;
@@ -70,7 +69,7 @@ body {
 
 #close-btn {
 	background-image: url('images/close.png'); 
-	right: 0;
+	right: 5%;
 	cursor: pointer;
 	z-index: 2;
 	width: 30px;
@@ -96,6 +95,10 @@ body {
 #slider.slider-active:after{
 	margin-left: 40%;
 	opacity: 1;
+}
+
+#slider.slider-postactive:after{
+	opacity: 0;
 }
 
 
@@ -135,6 +138,7 @@ body {
 	right: 0;
 	top:0;
 	opacity: 0.65;
+	transition: 0.5s;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
@@ -142,9 +146,74 @@ body {
 	/* transform: rotate(180deg); */
 }
 
+.arrow-menu:hover {
+	opacity: 1;
+}
+
+.slide-menu {
+	opacity: 0; /* opacity: 0.369; */
+	width: 293px;
+	height: 477px;
+	filter: blur(4px);
+	background-color: #fff;
+	position: absolute;
+	right: -293px;
+	z-index: 1;
+}
+
+.slide-menu-content {
+	width: 293px;
+	height: 477px;
+	position: absolute;
+	right: -293px;
+	opacity: 0;
+	z-index: 1;
+	/* overflow: scroll; */
+}
+
+.slide-menu-content h1 {
+	margin: 8px 0 38px 0;
+	color: #fff;
+	text-align: center;
+	font-size: 18px;
+	text-shadow: 1px 1.732px 5px rgba(0, 0, 0, 0.75);
+	text-transform: uppercase;
+}
+
+.slide-menu-content p {
+	color: #fff;
+	margin: 0 0 20px 30px;
+	font-size: 15.5px;
+	text-shadow: 1px 1.732px 5px rgba(0, 0, 0, 0.75);
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+.unactive {
+	opacity: 0.6;
+	cursor: default !important;
+}
+
+.slide-menu-content p>span{
+	font-size: 12px;
+}
+
+
 .slide img {
 	height: 100%;
 	width: auto;
+	z-index: 0;
+}
+
+.menu-point {
+	height: 100%;
+	width: 318px;
+	background-color: #fff;
+	position: absolute;
+	right: -318px;
+	top:0;
+	opacity: 0;
+	z-index: 2;
 }
 
 /* Мини слайдер */	
@@ -189,7 +258,7 @@ body {
 	z-index: 1;
 	position: absolute;
 	top: 75%;
-	opacity: 1; /* 0 */
+	opacity: 0; /* 0 */
 	overflow: hidden;
 	transition: 0.5s;
 }
@@ -271,3 +340,5 @@ body {
 .image7 {
 	background-image: url('images/1 (7).jpeg');
 }
+
+

@@ -86,6 +86,21 @@ $('document').ready(function() {
 		//Запас на анимацию при наведении
 		m_slidesWidth = m_slidesWidth + 300;
 
+		//Клик на пункт меню
+		$('.menu-point-link').click(function(){
+			slidesWidth = slidesWidth + 318;
+			$('.slides').css('width', slidesWidth);
+
+			$(this).parent().parent().animate({
+				marginRight: '328',
+			})
+
+			$(this).parent().parent().find('.menu-point').animate({
+				opacity: 1
+			})
+
+		})
+
 		$('.slides').css('width', slidesWidth);
 		$('.mini-slides').css('width', m_slidesWidth);
 
@@ -108,6 +123,7 @@ $('document').ready(function() {
 				slide[currentImage+2])]);
 		}
 
+
 		//Анимируется подъезжание слайдов
 		$('.slides').animate({
 			marginLeft: currentMargin
@@ -119,10 +135,97 @@ $('document').ready(function() {
 
 		$('#slider').addClass('slider-active');
 
+		setTimeout(function() {
+			$('#slider').addClass('slider-postactive');
+		}, 1000);
+		
+
 		//Стилизация мини-слайдера при наведении 
 		let op065 = null, 
 			op0   = null;
 
+		let isMenuClicked = 0;
+
+		//Нажатие на кнопку меню
+		$('.arrow-menu').click(function(){
+			if(isMenuClicked === 0){
+				isMenuClicked = 1;
+				$('.arrow-menu').css('transform', 'rotate(180deg)');
+				$(this).parent().find('.slide-menu-content').animate({
+					opacity: '1',
+					right: '0'
+				},300);
+				$(this).parent().find('.slide-menu').animate({
+					opacity: '0.369',
+					right: '0'
+				},300);
+				$(this).parent().find('img').css('filter', 'blur(2px) brightness(65%)');
+				$('#mini-slider').css('display', 'none');
+
+			}else{
+				isMenuClicked = 0;
+				$('.arrow-menu').css('transform', 'rotate(360deg)');
+				$(this).parent().find('.slide-menu-content').animate({
+					opacity: '0',
+					right: '-293'
+				},300);
+				$(this).parent().find('.slide-menu').animate({
+					opacity: '0',
+					right: '-293'
+				},300);
+				$(this).parent().find('img').css('filter', 'blur(0) brightness(100%)');
+				$('#mini-slider').css('display', 'block');
+			}
+		});
+
+		//курсор над кнопкой меню
+		$('.arrow-menu').hover(function(){
+			if(isMenuClicked === 0){
+				$('.arrow-menu').css('transform', 'rotate(180deg)');
+				$(this).parent().find('.slide-menu-content').animate({
+					opacity: '1',
+					right: '0'
+				},300);
+				$(this).parent().find('.slide-menu').animate({
+					opacity: '0.369',
+					right: '0'
+				},300);
+
+				$(this).parent().find('img').css('filter', 'blur(2px) brightness(65%)');
+			}
+		},function(){
+			$(this).parent().find('.slide-menu-content').hover(function(){
+			}, function(){
+				if(isMenuClicked === 0){
+					$('.arrow-menu').css('transform', 'rotate(360deg)');
+					$(this).animate({
+						opacity: '0',
+						right: '-293'
+					},300);
+					$(this).parent().find('.slide-menu').animate({
+						opacity: '0',
+						right: '-293'
+					},300);
+					$(this).parent().find('img').css('filter', 'blur(0) brightness(100%)');
+				}else{
+					$(this).parent().find('.slide-menu-content').animate({
+						opacity: '1',
+						right: '0'
+					},300);
+					$(this).parent().find('.slide-menu').animate({
+						opacity: '0.369',
+						right: '0'
+					},300);
+				}				
+			});
+			
+		});
+
+		
+		
+
+
+		//анимация появления миниатюр
 		$('#mini-slider').hover(function(){
 
 			$(this).css('opacity', '1');
@@ -151,7 +254,7 @@ $('document').ready(function() {
 
 			});
 		},function(){
-			$(this).css('opacity', '1'); // 0
+			$(this).css('opacity', '0'); // 0
 			if (op065 !== null && op0 !== null) {
 				clearTimeout(op065);
 				clearTimeout(op0);
@@ -169,13 +272,20 @@ $('document').ready(function() {
 			}, 1000)
 
 			$('#slider').removeClass('slider-active');
-
-			//Исчезает окно медиа режима
-			$('#galleryModal').css('display', 'none');
+			$('#slider').removeClass('slider-postactive');
 
 			//Обновляется внешний отступ для анимации при повторной открытии медио режима
-			$('.slides').css('margin-left','100%');
-			$('.mini-slides').css('margin-left','100%');
+			$('.slides').animate({
+				marginLeft: '100%'
+			});
+			$('.mini-slides').animate({
+				marginLeft: '100%'
+			});
+
+			//Исчезает окно медиа режима
+			setTimeout(function() {
+				$('#galleryModal').css('display', 'none');
+			}, 500);
 
 		}
 	});
@@ -186,10 +296,9 @@ $('document').ready(function() {
 		}, 1500)
 
 		$('#slider').removeClass('slider-active');
+		$('#slider').removeClass('slider-postactive');
 
-		//Исчезает окно медиа режима
-		$('#galleryModal').css('display', 'none');
-
+		
 
 		//Обновляется внешний отступ для анимации при повторной открытии медио режима
 		$('.slides').animate({
@@ -198,6 +307,13 @@ $('document').ready(function() {
 		$('.mini-slides').animate({
 			marginLeft: '100%'
 		});
+
+		//Исчезает окно медиа режима
+		setTimeout(function() {
+			$('#galleryModal').css('display', 'none');
+		}, 500);
+		
+
 
 
 	});
@@ -287,7 +403,9 @@ $('document').ready(function() {
 	});
 
 	$('#slider').bind('mousewheel', function(e){
-		if(e.originalEvent.wheelDelta /120 > 0) {
+
+		console.log(e.originalEvent.wheelDelta)
+		if(e.originalEvent.wheelDelta /120 > 0) {   //edit scroll here
 			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
 		
 			if(currentMargin > x) {
@@ -324,7 +442,7 @@ $('document').ready(function() {
 			}
 			
 		}
-		else{
+		else if(e.originalEvent.wheelDelta /120 < 0){   //and here
 			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth + 10);
 			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
@@ -477,3 +595,7 @@ $('document').ready(function() {
 	})
 
 });
+
+/*	
+	4) Движение скроллом мыши не естественно (прыгают картинки из угла в угол, не соответствуя движениям мыши);
+*/
