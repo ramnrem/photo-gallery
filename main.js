@@ -1,5 +1,9 @@
 $('document').ready(function() {
 
+	$(window).resize(function(){
+
+	})
+
 
 	//Проверка вместимости слайдов
 	$.fn.isOverflowing = function(child1,child2,child3) {
@@ -12,6 +16,20 @@ $('document').ready(function() {
 		} else if(p.offsetWidth < el1.offsetWidth + el2.offsetWidth + el3.offsetWidth) {
 			return 2;	
 		} else return 0;
+	};
+
+	//Проверка вместимости menu-point
+	$.fn.isMenuOverflowing = function(slide) {
+		let p = $(this).get(0);
+		let el_slide = $(slide).get(0);
+		let el_menu = 318;
+		if( p.offsetWidth >= (el_slide.offsetWidth + el_menu)) {
+			return 0; //menu-point вмещается
+
+		} else if(p.offsetWidth < el_slide.offsetWidth + el_menu) {
+			let width = (el_slide.offsetWidth + el_menu) - p.offsetWidth;
+			return width; //menu-point не вмещается
+		} 
 	};
 
 	//Функция применяющия фильтры на слайд 
@@ -43,7 +61,10 @@ $('document').ready(function() {
 		m_clickedImage,
 		m_currentMargin,
 		m_slidesWidth,
-		m_currentImage;
+		m_currentImage,
+		menuMargin,
+		isMenuClicked = 0,
+		isLinkClicked = 0;
 
 
 	// Открытие медиа режима
@@ -82,23 +103,65 @@ $('document').ready(function() {
 			slidesWidth = slidesWidth + slide[i].offsetWidth + 10;
 			m_slidesWidth = m_slidesWidth + m_slide[i].offsetWidth + 10
 		}
+		
+		//костыль, пересчитывающий отступ при сворачивании-разворачивании окна браузера
+		$(window).resize(function(){
+			currentMargin = 0;
+			slidesWidth = 0;
+			m_slidesWidth = 0;
+			m_currentMargin = 0;
+
+			for(let i = 0; i < slide.length; i++) {
+				slidesWidth = slidesWidth + slide[i].offsetWidth + 10;
+				m_slidesWidth = m_slidesWidth + m_slide[i].offsetWidth + 10
+			}
+			
+			for(let i = 0; i < currentImage; i++){
+				currentMargin = currentMargin - slide[i].offsetWidth - 10;
+				m_currentMargin = m_currentMargin - m_slide[i].offsetWidth - 10
+			}
+			
+			$('.slides').css('margin-left', currentMargin);
+			$('.mini-slides').css('margin-left', m_currentMargin);
+		})
 
 		//Запас на анимацию при наведении
 		m_slidesWidth = m_slidesWidth + 300;
 
 		//Клик на пункт меню
 		$('.menu-point-link').click(function(){
-			slidesWidth = slidesWidth + 318;
-			$('.slides').css('width', slidesWidth);
+			if(isLinkClicked === 0) {
+				menuMargin = $('#slider').isMenuOverflowing(slide[currentImage]);
+				currentMargin = currentMargin - menuMargin;
+				$('.slides').animate({
+					marginLeft: currentMargin
+				}, 670)
 
-			$(this).parent().parent().animate({
-				marginRight: '328',
-			})
+				$(this).parent().parent().find('.menu-point').css('display','block');
 
-			$(this).parent().parent().find('.menu-point').animate({
-				opacity: 1
-			})
+				console.log($(this).hasClass('info'));
 
+				if($(this).hasClass('info'))
+					$('.point-info').css('display','block');
+				else if($(this).hasClass('comm'))
+					$('.point-comm').css('display','block');
+				else $('.point-like').css('display','block');
+				
+				slidesWidth = slidesWidth + 318;
+				$('.slides').css('width', slidesWidth);
+
+				$(this).parent().parent().animate({
+					marginRight: '328',
+				});
+
+				$(this).parent().parent().find('.menu-point').animate({
+					opacity: 1
+				},600);
+				setTimeout(function() {
+					isLinkClicked = 1;
+				},300);
+			}
+			
 		})
 
 		$('.slides').css('width', slidesWidth);
@@ -128,7 +191,7 @@ $('document').ready(function() {
 		$('.slides').animate({
 			marginLeft: currentMargin
 		}, 670)
-
+		
 		$('.mini-slides').animate({
 			marginLeft: m_currentMargin
 		}, 1000)
@@ -137,20 +200,21 @@ $('document').ready(function() {
 
 		setTimeout(function() {
 			$('#slider').addClass('slider-postactive');
-		}, 1000);
+		}, 2000);
+
 		
 
 		//Стилизация мини-слайдера при наведении 
 		let op065 = null, 
 			op0   = null;
 
-		let isMenuClicked = 0;
-
 		//Нажатие на кнопку меню
 		$('.arrow-menu').click(function(){
 			if(isMenuClicked === 0){
 				isMenuClicked = 1;
-				$('.arrow-menu').css('transform', 'rotate(180deg)');
+				$(this).parent().find('.slide-menu-content').css('display','block');
+				$(this).parent().find('.slide-menu').css('display','block');
+				$(this).css('transform', 'rotate(180deg)');
 				$(this).parent().find('.slide-menu-content').animate({
 					opacity: '1',
 					right: '0'
@@ -164,7 +228,7 @@ $('document').ready(function() {
 
 			}else{
 				isMenuClicked = 0;
-				$('.arrow-menu').css('transform', 'rotate(360deg)');
+				$(this).css('transform', 'rotate(360deg)');
 				$(this).parent().find('.slide-menu-content').animate({
 					opacity: '0',
 					right: '-293'
@@ -175,13 +239,21 @@ $('document').ready(function() {
 				},300);
 				$(this).parent().find('img').css('filter', 'blur(0) brightness(100%)');
 				$('#mini-slider').css('display', 'block');
+				setTimeout(function(){
+					$('.slide-menu-content').css('display','none');
+					$('.slide-menu').css('display','none');
+				},300)
 			}
 		});
 
 		//курсор над кнопкой меню
 		$('.arrow-menu').hover(function(){
+			//Нажатие не было произведено 
 			if(isMenuClicked === 0){
-				$('.arrow-menu').css('transform', 'rotate(180deg)');
+
+				$(this).parent().find('.slide-menu-content').css('display','block');
+				$(this).parent().find('.slide-menu').css('display','block');
+				$(this).css('transform', 'rotate(180deg)');
 				$(this).parent().find('.slide-menu-content').animate({
 					opacity: '1',
 					right: '0'
@@ -190,40 +262,32 @@ $('document').ready(function() {
 					opacity: '0.369',
 					right: '0'
 				},300);
-
 				$(this).parent().find('img').css('filter', 'blur(2px) brightness(65%)');
 			}
 		},function(){
-			$(this).parent().find('.slide-menu-content').hover(function(){
-			}, function(){
-				if(isMenuClicked === 0){
-					$('.arrow-menu').css('transform', 'rotate(360deg)');
-					$(this).animate({
-						opacity: '0',
-						right: '-293'
-					},300);
-					$(this).parent().find('.slide-menu').animate({
-						opacity: '0',
-						right: '-293'
-					},300);
-					$(this).parent().find('img').css('filter', 'blur(0) brightness(100%)');
-				}else{
-					$(this).parent().find('.slide-menu-content').animate({
-						opacity: '1',
-						right: '0'
-					},300);
-					$(this).parent().find('.slide-menu').animate({
-						opacity: '0.369',
-						right: '0'
-					},300);
-				}				
-			});
-			
+			$(this).parent().find('.slide-menu-content').css('display','block');
+			$(this).parent().find('.slide-menu').css('display','block');
 		});
+		$('.slide-menu-content').hover(function(){
+		}, function(){
+			if(isMenuClicked === 0 && isLinkClicked === 0){
+				$(this).parent().find('.arrow-menu').css('transform', 'rotate(360deg)');
+				$(this).animate({
+					opacity: '0',
+					right: '-293'
+				},300);
+				$(this).parent().find('.slide-menu').animate({
+					opacity: '0',
+					right: '-293'
+				},300);
+				$(this).parent().find('img').css('filter', 'blur(0) brightness(100%)');
+				setTimeout(function(){
+					$('.slide-menu-content').css('display','none');
+					$('.slide-menu').css('display','none');
+				},300)
 
-		
-		
-
+			}		
+		});
 
 		//анимация появления миниатюр
 		$('#mini-slider').hover(function(){
@@ -288,6 +352,55 @@ $('document').ready(function() {
 			}, 500);
 
 		}
+
+		//клик вне slide-menu-content закрывает меню
+		let btn = document.getElementsByClassName('arrow-menu')[currentImage];
+		let sld = $('.slide-menu-content');
+
+		if (e.target != btn && !sld.is(e.target) && sld.has(e.target).length === 0){
+			isMenuClicked = 0;
+			$('.arrow-menu').css('transform', 'rotate(360deg)');
+			$('.slide-menu-content').animate({
+				opacity: '0',
+				right: '-293'
+			},300);
+			$('.slide-menu').animate({
+				opacity: '0',
+				right: '-293'
+			},300);
+			$('img').css('filter', 'blur(0) brightness(100%)');
+			$('#mini-slider').css('display', 'block');
+			setTimeout(function(){
+				$('.slide-menu-content').css('display','none');
+				$('.slide-menu').css('display','none');
+			},300)
+		}
+
+		let mpoint = $('.menu-point')
+		if (!mpoint.is(e.target) && mpoint.has(e.target).length === 0 && isLinkClicked === 1){
+
+			currentMargin = currentMargin + menuMargin;
+			$('.slides').animate({
+				marginLeft: currentMargin
+			}, 670)
+
+			isLinkClicked = 0;
+			slidesWidth = slidesWidth - 318;
+			$('.slides').animate({width: slidesWidth});
+
+			$('.slide').animate({
+				marginRight: '10'
+			},300)
+			$('.menu-point').animate({
+				opacity: 0
+			},150);
+			setTimeout(function(){
+				$('.menu-point').css('display','none');
+				$('.point-like').css('display','none');
+				$('.point-comm').css('display','none');
+				$('.point-info').css('display','none');
+			},300)
+		}
 	});
 
 	$('#close-btn').click(function(){
@@ -313,9 +426,6 @@ $('document').ready(function() {
 			$('#galleryModal').css('display', 'none');
 		}, 500);
 		
-
-
-
 	});
 
 	//Клик вправо
@@ -404,8 +514,8 @@ $('document').ready(function() {
 
 	$('#slider').bind('mousewheel', function(e){
 
-		console.log(e.originalEvent.wheelDelta)
-		if(e.originalEvent.wheelDelta /120 > 0) {   //edit scroll here
+		let sld = $('.slide-menu-content');
+		if(e.originalEvent.wheelDelta /120 > 0 && !sld.is(e.target) && sld.has(e.target).length === 0) {   //edit scroll here
 			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
 		
 			if(currentMargin > x) {
@@ -442,7 +552,7 @@ $('document').ready(function() {
 			}
 			
 		}
-		else if(e.originalEvent.wheelDelta /120 < 0){   //and here
+		else if(e.originalEvent.wheelDelta /120 < 0 && !sld.is(e.target) && sld.has(e.target).length === 0){   //and here
 			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth + 10);
 			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
@@ -522,7 +632,7 @@ $('document').ready(function() {
 		}
 	});
 
-	$('.mini-slides').bind('mousewheel', function(e){
+	$('.mini-slides').bind('mousewheel', function(){
 		if(e.originalEvent.wheelDelta /120 > 0) {
 			let x = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth - 10 - 320);
 

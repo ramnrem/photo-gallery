@@ -12,8 +12,6 @@ body {
 	padding: 0;
 }
 
-
-
 .modal {
 	display: none; 
 	position: fixed;
@@ -35,7 +33,7 @@ body {
 
 .arrow {
 	cursor: pointer;
-	z-index: 2;
+	z-index: 4;
 	width: 20px;
 	height: 75px;
 	position: absolute;
@@ -138,7 +136,7 @@ body {
 	right: 0;
 	top:0;
 	opacity: 0.65;
-	transition: 0.5s;
+	transition: 0.3s;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
@@ -159,6 +157,7 @@ body {
 	position: absolute;
 	right: -293px;
 	z-index: 1;
+	display: none;
 }
 
 .slide-menu-content {
@@ -168,7 +167,8 @@ body {
 	right: -293px;
 	opacity: 0;
 	z-index: 1;
-	/* overflow: scroll; */
+	display: none;
+	overflow: auto; 
 }
 
 .slide-menu-content h1 {
@@ -192,6 +192,7 @@ body {
 .unactive {
 	opacity: 0.6;
 	cursor: default !important;
+	pointer-events: none;
 }
 
 .slide-menu-content p>span{
@@ -214,13 +215,41 @@ body {
 	top:0;
 	opacity: 0;
 	z-index: 2;
+	display: none;
+}
+
+.point {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.point-comm,
+.point-like,
+.point-info {
+	display: none
+}
+
+
+
+.point > h3 {
+	font-size: 18px;
+	text-align: center;
+	text-transform: uppercase;
+	color: #adbbd7;
+}
+
+.point > p {
+	padding-left: 15px;
+	font-size: 16px;
+
 }
 
 /* Мини слайдер */	
 
 .mini-arrow {
 	cursor: pointer;
-	z-index: 2;
+	z-index: 4;
 	width: 10px;
 	height: 45px;
 	position: absolute;
