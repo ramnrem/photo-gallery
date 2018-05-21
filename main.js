@@ -1,10 +1,5 @@
 $('document').ready(function() {
 
-	$(window).resize(function(){
-
-	})
-
-
 	//Проверка вместимости слайдов
 	$.fn.isOverflowing = function(child1,child2,child3) {
 		let p = $(this).get(0);
@@ -63,6 +58,9 @@ $('document').ready(function() {
 		m_slidesWidth,
 		m_currentImage,
 		menuMargin,
+		clicked = 0,
+		closed = 0,
+		isMenuOpened = 0;
 		isMenuClicked = 0,
 		isLinkClicked = 0;
 
@@ -103,26 +101,64 @@ $('document').ready(function() {
 			slidesWidth = slidesWidth + slide[i].offsetWidth + 10;
 			m_slidesWidth = m_slidesWidth + m_slide[i].offsetWidth + 10
 		}
+
+		console.log(slidesWidth);
 		
 		//костыль, пересчитывающий отступ при сворачивании-разворачивании окна браузера
 		$(window).resize(function(){
+
+			if(isMenuOpened === 1){
+				isMenuOpened = 0;
+				closed = 1;
+
+				currentMargin = currentMargin + menuMargin;
+				$('.slides').animate({
+					marginLeft: currentMargin
+				}, 200)
+
+				isLinkClicked = 0;
+				$('.slide').animate({
+					marginRight: '10'
+				},300)
+				$('.menu-point').animate({
+					opacity: 0
+				},150);
+				setTimeout(function(){
+					$('.menu-point').css('display','none');
+					$('.point-like').css('display','none');
+					$('.point-comm').css('display','none');
+					$('.point-info').css('display','none');
+				},300)
+			}
+			
+			//Левый отступ не слитает без клика на меню
 			currentMargin = 0;
 			slidesWidth = 0;
 			m_slidesWidth = 0;
 			m_currentMargin = 0;
+			closed = 0;
 
+			if(clicked === 1)
+				slidesWidth = slidesWidth + 116;
+
+			if(currentImage > 0) {
+				for(let i = 0; i < currentImage; i++){
+					currentMargin = currentMargin - slide[i].offsetWidth - 10;
+					m_currentMargin = m_currentMargin - m_slide[i].offsetWidth - 10
+				}
+			}
 			for(let i = 0; i < slide.length; i++) {
 				slidesWidth = slidesWidth + slide[i].offsetWidth + 10;
 				m_slidesWidth = m_slidesWidth + m_slide[i].offsetWidth + 10
 			}
-			
-			for(let i = 0; i < currentImage; i++){
-				currentMargin = currentMargin - slide[i].offsetWidth - 10;
-				m_currentMargin = m_currentMargin - m_slide[i].offsetWidth - 10
-			}
-			
+			m_slidesWidth = m_slidesWidth + 300;
+
+			console.log(slidesWidth);
 			$('.slides').css('margin-left', currentMargin);
 			$('.mini-slides').css('margin-left', m_currentMargin);
+			//////////////////////////////////////////////
+
+
 		})
 
 		//Запас на анимацию при наведении
@@ -131,6 +167,8 @@ $('document').ready(function() {
 		//Клик на пункт меню
 		$('.menu-point-link').click(function(){
 			if(isLinkClicked === 0) {
+				isMenuOpened = 1;
+				clicked = 1;
 				menuMargin = $('#slider').isMenuOverflowing(slide[currentImage]);
 				currentMargin = currentMargin - menuMargin;
 				$('.slides').animate({
@@ -139,19 +177,20 @@ $('document').ready(function() {
 
 				$(this).parent().parent().find('.menu-point').css('display','block');
 
-				console.log($(this).hasClass('info'));
 
 				if($(this).hasClass('info'))
 					$('.point-info').css('display','block');
 				else if($(this).hasClass('comm'))
 					$('.point-comm').css('display','block');
 				else $('.point-like').css('display','block');
-				
-				slidesWidth = slidesWidth + 318;
+
+				if (closed === 0) 
+					slidesWidth = slidesWidth + 318;
+
 				$('.slides').css('width', slidesWidth);
 
 				$(this).parent().parent().animate({
-					marginRight: '328',
+					marginRight: '318',
 				});
 
 				$(this).parent().parent().find('.menu-point').animate({
@@ -215,13 +254,14 @@ $('document').ready(function() {
 				$(this).parent().find('.slide-menu-content').css('display','block');
 				$(this).parent().find('.slide-menu').css('display','block');
 				$(this).css('transform', 'rotate(180deg)');
-				$(this).parent().find('.slide-menu-content').animate({
-					opacity: '1',
-					right: '0'
-				},300);
+				
 				$(this).parent().find('.slide-menu').animate({
 					opacity: '0.369',
 					right: '0'
+				},300);
+				$(this).parent().find('.slide-menu-content').animate({
+					right: '0',
+					opacity: '1'
 				},300);
 				$(this).parent().find('img').css('filter', 'blur(2px) brightness(65%)');
 				$('#mini-slider').css('display', 'none');
@@ -230,9 +270,12 @@ $('document').ready(function() {
 				isMenuClicked = 0;
 				$(this).css('transform', 'rotate(360deg)');
 				$(this).parent().find('.slide-menu-content').animate({
-					opacity: '0',
+					opacity: '0'
+				},100);
+				$(this).parent().find('.slide-menu-content').animate({
 					right: '-293'
 				},300);
+				
 				$(this).parent().find('.slide-menu').animate({
 					opacity: '0',
 					right: '-293'
@@ -273,7 +316,9 @@ $('document').ready(function() {
 			if(isMenuClicked === 0 && isLinkClicked === 0){
 				$(this).parent().find('.arrow-menu').css('transform', 'rotate(360deg)');
 				$(this).animate({
-					opacity: '0',
+					opacity: '0'
+				},100);
+				$(this).animate({
 					right: '-293'
 				},300);
 				$(this).parent().find('.slide-menu').animate({
@@ -359,15 +404,23 @@ $('document').ready(function() {
 
 		if (e.target != btn && !sld.is(e.target) && sld.has(e.target).length === 0){
 			isMenuClicked = 0;
+
 			$('.arrow-menu').css('transform', 'rotate(360deg)');
-			$('.slide-menu-content').animate({
-				opacity: '0',
-				right: '-293'
-			},300);
+
 			$('.slide-menu').animate({
 				opacity: '0',
 				right: '-293'
 			},300);
+
+			$('.slide-menu-content').animate({
+				opacity: '0'
+			},100);
+			$('.slide-menu-content').animate({
+				right: '-293'
+			},300);
+
+			
+
 			$('img').css('filter', 'blur(0) brightness(100%)');
 			$('#mini-slider').css('display', 'block');
 			setTimeout(function(){
@@ -378,16 +431,15 @@ $('document').ready(function() {
 
 		let mpoint = $('.menu-point')
 		if (!mpoint.is(e.target) && mpoint.has(e.target).length === 0 && isLinkClicked === 1){
+			isMenuOpened = 0;
+			closed = 1;
 
 			currentMargin = currentMargin + menuMargin;
 			$('.slides').animate({
 				marginLeft: currentMargin
-			}, 670)
+			}, 200)
 
 			isLinkClicked = 0;
-			slidesWidth = slidesWidth - 318;
-			$('.slides').animate({width: slidesWidth});
-
 			$('.slide').animate({
 				marginRight: '10'
 			},300)
@@ -400,6 +452,7 @@ $('document').ready(function() {
 				$('.point-comm').css('display','none');
 				$('.point-info').css('display','none');
 			},300)
+
 		}
 	});
 
@@ -430,9 +483,15 @@ $('document').ready(function() {
 
 	//Клик вправо
 	$('#arrow-right').click(function(){
+
+		let x;
 		
 		//Ширина линии слайдой без последнего элемента
-		let x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
+		if(closed === 0)
+			x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
+		else x = -(slidesWidth - 318 - slide[slide.length - 1].offsetWidth - 10);
+
+		console.log(x, currentMargin)
 
 		if(currentMargin > x) {
 			currentMargin = currentMargin - slide[currentImage].offsetWidth - 10;
@@ -477,7 +536,11 @@ $('document').ready(function() {
 		let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
 		if(currentMargin == -20 || currentMargin == 0) {
-			currentMargin = x;
+
+			if(closed === 1)
+				currentMargin = x + 318;
+			else currentMargin = x;
+
 			m_currentMargin = y;
 			$('.slides').animate({
 				marginLeft: currentMargin
@@ -487,6 +550,8 @@ $('document').ready(function() {
 			})
 			currentImage = slide.length - 1;
 			m_currentImage = slide.length - 1;
+
+			console.log( "to end "+currentMargin)
 
 		}else {
 			currentMargin = currentMargin + slide[currentImage - 1].offsetWidth + 10;
@@ -499,6 +564,8 @@ $('document').ready(function() {
 			})
 			currentImage--;
 			m_currentImage--;
+
+			console.log( "1 left "+currentMargin)
 		}
 
 		disableFilters(slide[currentImage]);
@@ -516,30 +583,29 @@ $('document').ready(function() {
 
 		let sld = $('.slide-menu-content');
 		if(e.originalEvent.wheelDelta /120 > 0 && !sld.is(e.target) && sld.has(e.target).length === 0) {   //edit scroll here
-			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
+			let x;
+
+			if(clicked === 0)
+				x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
+			else x = -(slidesWidth - slide[slide.length - 1].offsetWidth - 10);
 		
 			if(currentMargin > x) {
 				currentMargin = currentMargin - slide[currentImage].offsetWidth - 10;
-				m_currentMargin = m_currentMargin - m_slide[m_currentImage].offsetWidth - 10;
+				
 				$('.slides').animate({
 					marginLeft: currentMargin
 				});
-				$('.mini-slides').animate({
-					marginLeft: m_currentMargin
-				});
+				
 				currentImage++;
-				m_currentImage++;
+				
 			}else{
 				$('.slides').animate({
 					marginLeft: '0'
 				});
-				$('.mini-slides').animate({
-					marginLeft: '0'
-				});
+				
 				currentMargin = 0;
 				currentImage = 0;
-				m_currentMargin = 0;
-				m_currentImage = 0;
+				
 			}
 
 			disableFilters(slide[currentImage]);
@@ -554,31 +620,22 @@ $('document').ready(function() {
 		}
 		else if(e.originalEvent.wheelDelta /120 < 0 && !sld.is(e.target) && sld.has(e.target).length === 0){   //and here
 			let x = -(slidesWidth - slide[slide.length - 1].offsetWidth + 10);
-			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
-
 			if(currentMargin == -20 || currentMargin == 0) {
 				currentMargin = x;
-				m_currentMargin = y;
+				
 				$('.slides').animate({
 					marginLeft: currentMargin
-				})
-				$('.mini-slides').animate({
-					marginLeft: m_currentMargin
 				})
 				currentImage = slide.length - 1;
-				m_currentImage = slide.length - 1;
-
 			}else {
 				currentMargin = currentMargin + slide[currentImage - 1].offsetWidth + 10;
-				m_currentMargin = m_currentMargin + m_slide[m_currentImage - 1].offsetWidth + 10;
+				
 				$('.slides').animate({
 					marginLeft: currentMargin
 				})
-				$('.mini-slides').animate({
-					marginLeft: m_currentMargin
-				})
+				
 				currentImage--;
-				m_currentImage--;
+				
 			}
 
 			disableFilters(slide[currentImage]);
@@ -615,9 +672,11 @@ $('document').ready(function() {
 
 	$('#mini-arrow-left').click(function(){
 
+		console.log(m_currentMargin)
+
 		let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
-		if(m_currentMargin == -20 || m_currentMargin == 0) {
+		if(m_currentMargin > -20 && m_currentMargin <= 0) {
 			m_currentMargin = y;
 			$('.mini-slides').animate({
 				marginLeft: m_currentMargin
@@ -632,7 +691,7 @@ $('document').ready(function() {
 		}
 	});
 
-	$('.mini-slides').bind('mousewheel', function(){
+	$('#mini-slider').bind('mousewheel', function(e){
 		if(e.originalEvent.wheelDelta /120 > 0) {
 			let x = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth - 10 - 320);
 
@@ -642,7 +701,6 @@ $('document').ready(function() {
 					marginLeft: m_currentMargin
 				});
 				m_currentImage++;
-			// Клик вправо при последнем элементе
 			}else{
 				$('.mini-slides').animate({
 					marginLeft: '0'
@@ -654,7 +712,9 @@ $('document').ready(function() {
 		else{
 			let y = -(m_slidesWidth - m_slide[slide.length - 1].offsetWidth + 10 - 320);
 
-			if(m_currentMargin == -20 || m_currentMargin == 0) {
+			console.log(m_currentMargin);
+
+			if(m_currentMargin > -20 && m_currentMargin <= 0) {
 				m_currentMargin = y;
 				$('.mini-slides').animate({
 					marginLeft: m_currentMargin
